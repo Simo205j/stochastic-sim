@@ -1,0 +1,14 @@
+build/
+cmake-build-*/
+.DS_Store
+
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+
+experiments/data/*
+experiments/plots/*
+!experiments/data/.gitkeep
+!experiments/plots/.gitkeep
