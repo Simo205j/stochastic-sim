@@ -1,19 +1,38 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.25)
 
-project(
-    stochastic_sim
-    VERSION 0.1.0
-    LANGUAGES CXX
-)
+project(stochastic_sim LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_library(stochastic_sim INTERFACE)
+add_library(stochastic INTERFACE)
 
-target_include_directories(
-    stochastic_sim
-    INTERFACE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
+target_include_directories(stochastic INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+enable_testing()
+
+include(FetchContent)
+
+FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG v3.5.4
+)
+
+FetchContent_MakeAvailable(Catch2)
+
+add_executable(stochastic_tests
+    tests/reaction_tests.cpp
+)
+
+target_link_libraries(stochastic_tests
+    PRIVATE
+        stochastic
+        Catch2::Catch2WithMain
+)
+
+include(CTest)
+include(Catch)
+catch_discover_tests(stochastic_tests)

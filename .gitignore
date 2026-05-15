@@ -8,6 +8,9 @@ cmake-build-*/
 *.dylib
 *.exe
 
+build/
+compile_commands.json
+
 experiments/data/*
 experiments/plots/*
 !experiments/data/.gitkeep
