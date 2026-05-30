@@ -70,6 +70,13 @@ namespace stochastic
             return rate;
         }
 
+        struct NoObserver
+        {
+            void operator()(double, const State &) const
+            {
+            }
+        };
+
     } // namespace detail
 
     template <typename RandomGenerator, typename Observer>
@@ -127,6 +134,16 @@ namespace stochastic
 
             observer(time, state);
         }
+    }
+
+    template <typename RandomGenerator>
+    void simulate(
+        const std::vector<Reaction> &reactions,
+        State &state,
+        const double end_time,
+        RandomGenerator &random_generator)
+    {
+        simulate(reactions, state, end_time, random_generator, detail::NoObserver{});
     }
 
 } // namespace stochastic

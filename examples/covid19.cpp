@@ -1,8 +1,6 @@
 #include "stochastic/reaction.hpp"
 #include "stochastic/simulation.hpp"
 
-#include "trajectory_writer.hpp"
-
 #include <cmath>
 #include <cstdint>
 #include <iostream>
@@ -13,7 +11,16 @@
 namespace
 {
 
-    void run_covid19_example(const std::uint32_t population_size)
+    struct PeakHospitalizedResult
+    {
+        std::uint32_t population_size;
+        std::string population_name;
+        std::size_t peak_hospitalized;
+    };
+
+    auto estimate_peak_hospitalized(
+        const std::string &population_name,
+        const std::uint32_t population_size) -> PeakHospitalizedResult
     {
         using namespace stochastic;
 
@@ -59,12 +66,6 @@ namespace
         };
 
         auto random_generator = std::mt19937{42U};
-
-        auto writer = stochastic::examples::TrajectoryWriter{
-            "covid19_N" + std::to_string(population_size) + ".csv",
-            {"time", "S", "E", "I", "H", "R"},
-        };
-
         auto peak_hospitalized = std::size_t{0};
 
         constexpr auto end_time = 100.0; // days
@@ -74,20 +75,28 @@ namespace
             state,
             end_time,
             random_generator,
-            [&writer, &peak_hospitalized](const double time, const State &current_state)
+            [&peak_hospitalized, H](double, const State &current_state)
             {
-                writer.write_row(time, current_state);
-
-                if (current_state[3] > peak_hospitalized)
+                if (current_state[H.id] > peak_hospitalized)
                 {
-                    peak_hospitalized = current_state[3];
+                    peak_hospitalized = current_state[H.id];
                 }
             });
 
-        std::cout << "Wrote Covid-19 trajectory for N = "
-                  << population_size
-                  << ". Peak hospitalized = "
-                  << peak_hospitalized
+        return PeakHospitalizedResult{
+            .population_size = population_size,
+            .population_name = population_name,
+            .peak_hospitalized = peak_hospitalized,
+        };
+    }
+
+    void print_result(const PeakHospitalizedResult &result)
+    {
+        std::cout << result.population_name
+                  << " (N = "
+                  << result.population_size
+                  << "): peak hospitalized = "
+                  << result.peak_hospitalized
                   << '\n';
     }
 
@@ -95,5 +104,9 @@ namespace
 
 int main()
 {
-    run_covid19_example(10'000);
+    const auto nnj = estimate_peak_hospitalized("NNJ", 589'755);
+    const auto ndk = estimate_peak_hospitalized("NDK", 5'822'763);
+
+    print_result(nnj);
+    print_result(ndk);
 }
