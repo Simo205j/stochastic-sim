@@ -44,6 +44,33 @@ target_link_libraries(print_network
         stochastic
 )
 
+add_executable(abc_decay
+    examples/abc_decay.cpp
+)
+
+target_link_libraries(abc_decay
+    PRIVATE
+        stochastic
+)
+
+add_executable(circadian_rhythm
+    examples/circadian_rhythm.cpp
+)
+
+target_link_libraries(circadian_rhythm
+    PRIVATE
+        stochastic
+)
+
+add_executable(covid19
+    examples/covid19.cpp
+)
+
+target_link_libraries(covid19
+    PRIVATE
+        stochastic
+)
+
 include(CTest)
 include(Catch)
 catch_discover_tests(stochastic_tests)

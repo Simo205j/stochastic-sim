@@ -9,6 +9,7 @@ cmake-build-*/
 *.exe
 *.dot
 *.svg
+*.csv
 
 build/
 compile_commands.json
