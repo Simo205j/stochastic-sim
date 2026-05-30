@@ -7,9 +7,13 @@ cmake-build-*/
 *.so
 *.dylib
 *.exe
+*.dot
+*.svg
 
 build/
 compile_commands.json
+
+.cache/
 
 experiments/data/*
 experiments/plots/*

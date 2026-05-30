@@ -25,12 +25,22 @@ FetchContent_MakeAvailable(Catch2)
 
 add_executable(stochastic_tests
     tests/reaction_tests.cpp
+    tests/symbol_table_tests.cpp
 )
 
 target_link_libraries(stochastic_tests
     PRIVATE
         stochastic
         Catch2::Catch2WithMain
+)
+
+add_executable(print_network
+    examples/print_network.cpp
+)
+
+target_link_libraries(print_network
+    PRIVATE
+        stochastic
 )
 
 include(CTest)
