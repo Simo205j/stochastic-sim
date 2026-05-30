@@ -26,6 +26,7 @@ FetchContent_MakeAvailable(Catch2)
 add_executable(stochastic_tests
     tests/reaction_tests.cpp
     tests/symbol_table_tests.cpp
+    tests/simulation_tests.cpp
 )
 
 target_link_libraries(stochastic_tests
