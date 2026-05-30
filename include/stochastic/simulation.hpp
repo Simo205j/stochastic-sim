@@ -17,6 +17,8 @@ namespace stochastic
 
         inline auto has_inputs_available(const Reaction &reaction, const State &state) -> bool
         {
+            auto required = std::vector<std::size_t>(state.size(), 0);
+
             for (const auto &term : reaction.inputs.terms())
             {
                 if (term.reactant.id >= state.size())
@@ -24,7 +26,9 @@ namespace stochastic
                     return false;
                 }
 
-                if (state[term.reactant.id] == 0)
+                ++required[term.reactant.id];
+
+                if (state[term.reactant.id] < required[term.reactant.id])
                 {
                     return false;
                 }
@@ -48,23 +52,16 @@ namespace stochastic
 
         inline auto reaction_rate(const Reaction &reaction, const State &state) -> double
         {
+            if (!has_inputs_available(reaction, state))
+            {
+                return 0.0;
+            }
+
             auto rate = reaction.rate;
 
             for (const auto &term : reaction.inputs.terms())
             {
-                if (term.reactant.id >= state.size())
-                {
-                    return 0.0;
-                }
-
-                const auto amount = state[term.reactant.id];
-
-                if (amount == 0)
-                {
-                    return 0.0;
-                }
-
-                rate *= static_cast<double>(amount);
+                rate *= static_cast<double>(state[term.reactant.id]);
             }
 
             return rate;
