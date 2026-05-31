@@ -17,6 +17,10 @@ enable_testing()
 
 include(FetchContent)
 
+# --------------------
+# Catch2
+# --------------------
+
 FetchContent_Declare(
     Catch2
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
@@ -24,6 +28,30 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(Catch2)
+
+# --------------------
+# Google Benchmark
+# --------------------
+
+option(BUILD_BENCHMARKS "Build benchmark executables" ON)
+
+if(BUILD_BENCHMARKS)
+    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+    set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+    set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
+
+    FetchContent_Declare(
+        google_benchmark
+        GIT_REPOSITORY https://github.com/google/benchmark.git
+        GIT_TAG v1.9.1
+    )
+
+    FetchContent_MakeAvailable(google_benchmark)
+endif()
+
+# --------------------
+# Tests
+# --------------------
 
 add_executable(stochastic_tests
     tests/reaction_tests.cpp
@@ -36,6 +64,10 @@ target_link_libraries(stochastic_tests
         stochastic
         Catch2::Catch2WithMain
 )
+
+# --------------------
+# Examples
+# --------------------
 
 add_executable(print_network
     examples/print_network.cpp
@@ -84,6 +116,33 @@ target_link_libraries(covid19_parallel
         stochastic
         Threads::Threads
 )
+
+# --------------------
+# Benchmarks
+# --------------------
+
+if(BUILD_BENCHMARKS)
+    add_executable(covid19_benchmark
+        benchmarks/covid19_benchmark.cpp
+        examples/covid19_helper.cpp
+    )
+
+    target_link_libraries(covid19_benchmark
+        PRIVATE
+            stochastic
+            benchmark::benchmark
+            Threads::Threads
+    )
+
+    target_include_directories(covid19_benchmark
+        PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/examples
+    )
+endif()
+
+# --------------------
+# Test discovery
+# --------------------
 
 include(CTest)
 include(Catch)
