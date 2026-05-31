@@ -11,6 +11,8 @@ target_include_directories(stochastic INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
+find_package(Threads REQUIRED)
+
 enable_testing()
 
 include(FetchContent)
@@ -64,11 +66,23 @@ target_link_libraries(circadian_rhythm
 
 add_executable(covid19
     examples/covid19.cpp
+    examples/covid19_helper.cpp
 )
 
 target_link_libraries(covid19
     PRIVATE
         stochastic
+)
+
+add_executable(covid19_parallel
+    examples/covid19_parallel.cpp
+    examples/covid19_helper.cpp
+)
+
+target_link_libraries(covid19_parallel
+    PRIVATE
+        stochastic
+        Threads::Threads
 )
 
 include(CTest)
