@@ -10,10 +10,12 @@
 namespace
 {
 
+    // R5/R6: Demonstrates the library on the circadian rhythm example and writes a trajectory for plotting.
     void run_circadian_rhythm_example()
     {
         using namespace stochastic;
 
+        // R5: Reaction constants for the circadian rhythm stochastic system.
         constexpr auto alphaA = 50.0;
         constexpr auto alpha_A = 500.0;
         constexpr auto alphaR = 0.01;
@@ -30,6 +32,7 @@ namespace
         constexpr auto thetaA = 50.0;
         constexpr auto thetaR = 100.0;
 
+        // R5: Reactants in the circadian rhythm reaction network.
         const auto DA = Reactant{0};
         const auto D_A = Reactant{1};
         const auto DR = Reactant{2};
@@ -40,8 +43,10 @@ namespace
         const auto R = Reactant{7};
         const auto C = Reactant{8};
 
+        // R1/R5: Empty reaction side represents decay into the environment.
         const auto environment = ReactionSide{};
 
+        // R5: Initial state of the circadian rhythm system.
         auto state = State{
             1, // DA
             0, // D_A
@@ -54,6 +59,7 @@ namespace
             0, // C
         };
 
+        // R1/R4/R5: Circadian rhythm reaction network written with the reaction DSL.
         const auto reactions = std::vector<Reaction>{
             (A + DA) >> gammaA >>= D_A,
             D_A >> thetaA >>= DA + A,
@@ -81,6 +87,7 @@ namespace
 
         auto random_generator = std::mt19937{42U};
 
+        // R6: Writes the simulated amounts over time to CSV for plotting.
         auto writer = stochastic::examples::TrajectoryWriter{
             "circadian_rhythm.csv",
             {"time", "DA", "D_A", "DR", "D_R", "MA", "MR", "A", "R", "C"},
@@ -88,6 +95,7 @@ namespace
 
         constexpr auto end_time = 72.0; // hours
 
+        // R4/R6: Run the stochastic simulation and observe each trajectory state.
         simulate(
             reactions,
             state,
@@ -95,6 +103,7 @@ namespace
             random_generator,
             [&writer](const double time, const State &current_state)
             {
+                // R6: Store the current state so it can be visualised externally.
                 writer.write_row(time, current_state);
             });
     }

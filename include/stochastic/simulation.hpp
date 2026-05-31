@@ -37,6 +37,8 @@ namespace stochastic
             return true;
         }
 
+        // R4: Applies one stochastic reaction step by consuming input
+        // reactants and producing output reactants.
         inline void apply_reaction(const Reaction &reaction, State &state)
         {
             for (const auto &term : reaction.inputs.terms())
@@ -50,6 +52,8 @@ namespace stochastic
             }
         }
 
+        // R4: Computes the reaction rate from the base rate and the
+        // current quantities of all input reactants.
         inline auto reaction_rate(const Reaction &reaction, const State &state) -> double
         {
             if (!has_inputs_available(reaction, state))
@@ -76,6 +80,13 @@ namespace stochastic
 
     } // namespace detail
 
+    // R4: Implements the stochastic simulation algorithm by repeatedly
+    // sampling exponential delays and executing the reaction with the
+    // shortest delay.
+    //
+    // R7: Supports a user-supplied observer that receives each trajectory
+    // state during simulation, allowing clients to compute quantities such
+    // as peak hospitalisation without storing the full trajectory.
     template <typename RandomGenerator, typename Observer>
     void simulate(
         const std::vector<Reaction> &reactions,
@@ -133,6 +144,8 @@ namespace stochastic
         }
     }
 
+    // R4: Convenience overload for running the simulator when no trajectory
+    // observer is needed.
     template <typename RandomGenerator>
     void simulate(
         const std::vector<Reaction> &reactions,

@@ -11,6 +11,8 @@
 namespace stochastic
 {
 
+    // R3: Exception used when looking up a symbol that is not stored
+    // in the generic symbol table.
     struct SymbolNotFound : std::logic_error
     {
         SymbolNotFound()
@@ -19,6 +21,8 @@ namespace stochastic
         }
     };
 
+    // R3: Exception used when attempting to add a symbol that is
+    // already present in the generic symbol table.
     struct SymbolAlreadyDefined : std::logic_error
     {
         SymbolAlreadyDefined()
@@ -27,6 +31,9 @@ namespace stochastic
         }
     };
 
+    // R3: Generic symbol table for storing and looking up user-defined
+    // key/value types. The comparator constraint documents the required
+    // ordering support used by the underlying std::map.
     template <typename Key, typename Value, typename Compare = std::less<Key>>
     class SymbolTable
     {
@@ -35,6 +42,7 @@ namespace stochastic
             "SymbolTable requires a key type that can be compared by the chosen comparator");
 
     public:
+        // R3: Adds a new symbol and rejects duplicate definitions.
         void add(Key key, Value value)
         {
             if (symbols_.find(key) != symbols_.end())
@@ -45,6 +53,8 @@ namespace stochastic
             symbols_.emplace(std::move(key), std::move(value));
         }
 
+        // R3: Looks up an existing symbol and reports failure when the
+        // requested key is not present.
         [[nodiscard]] const Value &lookup(const Key &key) const
         {
             const auto it = symbols_.find(key);

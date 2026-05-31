@@ -4,6 +4,7 @@
 #include <stochastic/reaction.hpp>
 #include "stochastic/dot_printer.hpp"
 
+// R1/R8: Tests that reaction rules can be written directly in C++ using operators.
 TEST_CASE("reaction rule can be typeset with operators")
 {
   using namespace stochastic;
@@ -25,6 +26,7 @@ TEST_CASE("reaction rule can be typeset with operators")
   CHECK(reaction.products.terms()[1].reactant.id == C.id);
 }
 
+// R2/R8: Tests that the visitor-based DotPrinter emits the expected graph format.
 TEST_CASE("reaction can be printed as dot graph")
 {
   using namespace stochastic;
@@ -51,6 +53,7 @@ TEST_CASE("reaction can be printed as dot graph")
         "}\n");
 }
 
+// R1/R8: Tests that reaction sides can contain more than two reactants.
 TEST_CASE("reaction side can be extended with another reactant")
 {
   using namespace stochastic;
@@ -68,6 +71,7 @@ TEST_CASE("reaction side can be extended with another reactant")
   CHECK(side.terms()[2].reactant.id == C.id);
 }
 
+// R1/R8: Tests the alternative operator order for building reaction sides.
 TEST_CASE("reactant can be prepended to reaction side")
 {
   using namespace stochastic;
@@ -85,6 +89,7 @@ TEST_CASE("reactant can be prepended to reaction side")
   CHECK(side.terms()[2].reactant.id == C.id);
 }
 
+// R1/R8: Tests that repeated reactants are preserved for reactions requiring multiple units.
 TEST_CASE("reaction side preserves duplicate reactants")
 {
   using namespace stochastic;
@@ -99,6 +104,7 @@ TEST_CASE("reaction side preserves duplicate reactants")
   CHECK(side.terms()[1].reactant.id == A.id);
 }
 
+// R1/R8: Tests a reaction with multiple input reactants and one product.
 TEST_CASE("reaction rule supports multiple inputs and single product")
 {
   using namespace stochastic;
@@ -119,6 +125,7 @@ TEST_CASE("reaction rule supports multiple inputs and single product")
   CHECK(reaction.products.terms()[0].reactant.id == C.id);
 }
 
+// R1/R8: Tests a reaction with one input reactant and multiple products.
 TEST_CASE("reaction rule supports single input and multiple products")
 {
   using namespace stochastic;

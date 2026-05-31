@@ -7,6 +7,7 @@
 #include <random>
 #include <vector>
 
+// R4/R8: Tests that applying a reaction consumes inputs and produces products.
 TEST_CASE("simulation consumes inputs and produces products")
 {
     using namespace stochastic;
@@ -34,6 +35,7 @@ TEST_CASE("simulation consumes inputs and produces products")
     CHECK(state[C.id] == 1);
 }
 
+// R4/R8: Tests that a reaction cannot run when an input reactant is unavailable.
 TEST_CASE("simulation does nothing when required inputs are missing")
 {
     using namespace stochastic;
@@ -61,6 +63,7 @@ TEST_CASE("simulation does nothing when required inputs are missing")
     CHECK(state[C.id] == 1);
 }
 
+// R4/R7/R8: Tests that the simulation observer receives both initial and updated states.
 TEST_CASE("simulation calls observer with initial and updated states")
 {
     using namespace stochastic;
@@ -95,6 +98,7 @@ TEST_CASE("simulation calls observer with initial and updated states")
     CHECK(observed_states.back()[B.id] == 1);
 }
 
+// R7/R8: Tests that an observer can compute a peak value without storing the full trajectory.
 TEST_CASE("simulation observer can compute peak amount without storing trajectory")
 {
     using namespace stochastic;
@@ -133,6 +137,7 @@ TEST_CASE("simulation observer can compute peak amount without storing trajector
     CHECK(state[B.id] == 5);
 }
 
+// R4/R7/R8: Tests that an empty reaction network only reports the initial state.
 TEST_CASE("simulation with no reactions only observes the initial state")
 {
     using namespace stochastic;
@@ -163,6 +168,7 @@ TEST_CASE("simulation with no reactions only observes the initial state")
     CHECK(state[1] == 4);
 }
 
+// R4/R8: Tests that reactions scheduled after the end time are not applied.
 TEST_CASE("simulation stops before applying reaction after end time")
 {
     using namespace stochastic;
@@ -188,6 +194,7 @@ TEST_CASE("simulation stops before applying reaction after end time")
     CHECK(state[B.id] == 0);
 }
 
+// R4/R8: Tests the convenience overload that runs without a user-supplied observer.
 TEST_CASE("simulation overload without observer still runs")
 {
     using namespace stochastic;
@@ -208,6 +215,7 @@ TEST_CASE("simulation overload without observer still runs")
     CHECK(state[B.id] == 1);
 }
 
+// R4/R8: Tests that unavailable inputs make the reaction rate zero.
 TEST_CASE("reaction rate is zero when an input amount is missing")
 {
     using namespace stochastic;
@@ -222,6 +230,7 @@ TEST_CASE("reaction rate is zero when an input amount is missing")
     CHECK(detail::reaction_rate(reaction, state) == 0.0);
 }
 
+// R4/R8: Tests that out-of-range reactant ids are treated as unavailable inputs.
 TEST_CASE("reaction rate is zero when reactant id is outside state")
 {
     using namespace stochastic;
@@ -237,6 +246,7 @@ TEST_CASE("reaction rate is zero when reactant id is outside state")
     CHECK_FALSE(detail::has_inputs_available(reaction, state));
 }
 
+// R4/R8: Tests the stochastic rate formula using the product of available input amounts.
 TEST_CASE("reaction rate is multiplied by available input amounts")
 {
     using namespace stochastic;
@@ -252,6 +262,7 @@ TEST_CASE("reaction rate is multiplied by available input amounts")
     CHECK(detail::reaction_rate(reaction, state) == 6.0);
 }
 
+// R4/R8: Tests the low-level reaction application step from the simulation algorithm.
 TEST_CASE("apply reaction consumes inputs and produces products")
 {
     using namespace stochastic;
@@ -273,6 +284,7 @@ TEST_CASE("apply reaction consumes inputs and produces products")
     CHECK(state[C.id] == 1);
 }
 
+// R4/R8: Tests that the simulation terminates when no reaction can occur.
 TEST_CASE("simulation stops when no reactions are possible")
 {
     using namespace stochastic;
@@ -304,6 +316,7 @@ TEST_CASE("simulation stops when no reactions are possible")
     CHECK(state[B.id] == 0);
 }
 
+// R4/R8: Tests that duplicate input reactants require enough available amount.
 TEST_CASE("reaction requiring same input twice needs enough amount")
 {
     using namespace stochastic;
@@ -318,6 +331,7 @@ TEST_CASE("reaction requiring same input twice needs enough amount")
     CHECK_FALSE(detail::has_inputs_available(reaction, state));
 }
 
+// R4/R8: Tests that duplicate input reactants are consumed correctly when enough amount exists.
 TEST_CASE("reaction requiring same input twice is possible with enough amount")
 {
     using namespace stochastic;

@@ -7,10 +7,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
+# R6: Plot a stochastic simulation trajectory CSV as a PNG image.
 def plot_trajectory(csv_path: Path, output_path: Path | None = None) -> None:
     if not csv_path.exists():
         raise FileNotFoundError(f"CSV file does not exist: {csv_path}")
 
+    # R6: Load the trajectory produced by the C++ example programs.
     df = pd.read_csv(csv_path)
 
     if df.empty:
@@ -21,14 +23,17 @@ def plot_trajectory(csv_path: Path, output_path: Path | None = None) -> None:
             f"Expected at least two columns in {csv_path}: time plus one species."
         )
 
+    # R6: The first column is time, the remaining columns are reactant amounts.
     time_column = df.columns[0]
     species_columns = list(df.columns[1:])
 
+    # R6: Default to writing the plot next to the CSV unless an output path is given.
     output_path = output_path or csv_path.with_suffix(".png")
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     plt.figure(figsize=(10, 6))
 
+    # R6: Plot each reactant/species amount over simulation time.
     for species in species_columns:
         plt.plot(df[time_column], df[species], label=species)
 
@@ -40,6 +45,7 @@ def plot_trajectory(csv_path: Path, output_path: Path | None = None) -> None:
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
+    # R6: Save the generated visualisation for inclusion in the report.
     plt.savefig(output_path, dpi=200)
     plt.close()
 
@@ -47,6 +53,7 @@ def plot_trajectory(csv_path: Path, output_path: Path | None = None) -> None:
 
 
 def main() -> None:
+    # R6: Command-line interface for plotting a single trajectory CSV file.
     parser = argparse.ArgumentParser(
         description="Plot stochastic simulation trajectory CSV files."
     )

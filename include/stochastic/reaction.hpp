@@ -51,12 +51,16 @@ namespace stochastic
     double rate{};
     ReactionSide products;
 
+    // R2: Enables the visitor pattern for operations such as printing
+    // the reaction network in DOT graph format.
     void accept(ReactionVisitor &visitor) const
     {
       visitor.visit(*this);
     }
   };
 
+  // R1: Operator overloads for writing reaction rules directly in C++ code.
+  // Example: A + C >> lambda >>= B + C.
   inline ReactionSide operator+(Reactant lhs, Reactant rhs)
   {
     auto side = ReactionSide{lhs};
@@ -85,6 +89,8 @@ namespace stochastic
     return side;
   }
 
+  // R1: Stores the input side and reaction rate before the product side
+  // is attached by operator>>=.
   inline ReactionBuilder operator>>(ReactionSide inputs, double rate)
   {
     return ReactionBuilder{
@@ -98,6 +104,7 @@ namespace stochastic
     return ReactionSide{input} >> rate;
   }
 
+  // R1: Completes a reaction rule by connecting inputs, rate, and products.
   inline Reaction operator>>=(ReactionBuilder builder, ReactionSide products)
   {
     return Reaction{

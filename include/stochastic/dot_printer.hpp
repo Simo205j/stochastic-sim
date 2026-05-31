@@ -12,6 +12,8 @@
 namespace stochastic
 {
 
+    // R2: Visitor implementation that prints a reaction network in DOT graph
+    // format, which can be rendered by Graphviz.
     struct DotPrinter : ReactionVisitor
     {
         explicit DotPrinter(std::ostream &out, std::map<int, std::string> labels = {})
@@ -25,6 +27,8 @@ namespace stochastic
             out << "}\n";
         }
 
+        // R2: Each visited reaction is emitted as a graph node with edges from
+        // input reactants to the reaction and from the reaction to its products.
         void visit(const Reaction &reaction) override
         {
             const auto reaction_id = next_reaction_id++;

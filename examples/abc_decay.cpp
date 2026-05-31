@@ -11,6 +11,7 @@
 namespace
 {
 
+    // R5/R6: Runs one ABC decay example and writes its trajectory to CSV.
     void run_abc_decay_example(
         const std::string &output_path,
         stochastic::State initial_state,
@@ -21,20 +22,24 @@ namespace
 
         constexpr auto lambda = 0.001;
 
+        // R5: Reactants used in the ABC decay example from the assignment.
         const auto A = Reactant{0};
         const auto B = Reactant{1};
         const auto C = Reactant{2};
 
+        // R1/R5: Reaction rule A + C -> B + C written using the reaction DSL.
         const auto reaction = (A + C) >> lambda >>= (B + C);
         const auto reactions = std::vector<Reaction>{reaction};
 
         auto random_generator = std::mt19937{seed};
 
+        // R6: Writes the trajectory to CSV so the amounts can be plotted over time.
         auto writer = stochastic::examples::TrajectoryWriter{
             output_path,
             {"time", "A", "B", "C"},
         };
 
+        // R4/R6: Run the stochastic simulation and record each observed state.
         simulate(
             reactions,
             initial_state,
@@ -42,6 +47,7 @@ namespace
             random_generator,
             [&writer](const double time, const State &state)
             {
+                // R6: Store the current A, B and C amounts for plotting.
                 writer.write_row(time, {state[0], state[1], state[2]});
             });
     }
@@ -53,6 +59,7 @@ int main()
     constexpr auto end_time = 2'000.0;
     constexpr auto seed = 42U;
 
+    // R5/R6: Demonstrate the three ABC decay scenarios used for the plots.
     run_abc_decay_example(
         "abc_decay_A100_B0_C1.csv",
         stochastic::State{100, 0, 1},

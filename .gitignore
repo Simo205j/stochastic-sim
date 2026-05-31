@@ -20,3 +20,4 @@ experiments/data/*
 experiments/plots/*
 !experiments/data/.gitkeep
 !experiments/plots/.gitkeep
+__pycache__/
