@@ -2,7 +2,9 @@
 
 #include "stochastic/reaction.hpp"
 
+#include <concepts>
 #include <cstddef>
+#include <functional>
 #include <limits>
 #include <random>
 #include <vector>
@@ -15,7 +17,9 @@ namespace stochastic
     namespace detail
     {
 
-        inline auto has_inputs_available(const Reaction &reaction, const State &state) -> bool
+        inline auto has_inputs_available(
+            const Reaction &reaction,
+            const State &state) -> bool
         {
             auto required = std::vector<std::size_t>(state.size(), 0);
 
@@ -39,7 +43,9 @@ namespace stochastic
 
         // R4: Applies one stochastic reaction step by consuming input
         // reactants and producing output reactants.
-        inline void apply_reaction(const Reaction &reaction, State &state)
+        inline void apply_reaction(
+            const Reaction &reaction,
+            State &state)
         {
             for (const auto &term : reaction.inputs.terms())
             {
@@ -54,7 +60,9 @@ namespace stochastic
 
         // R4: Computes the reaction rate from the base rate and the
         // current quantities of all input reactants.
-        inline auto reaction_rate(const Reaction &reaction, const State &state) -> double
+        inline auto reaction_rate(
+            const Reaction &reaction,
+            const State &state) -> double
         {
             if (!has_inputs_available(reaction, state))
             {
@@ -93,28 +101,38 @@ namespace stochastic
         State &state,
         const double end_time,
         RandomGenerator &random_generator,
-        Observer observer)
+        Observer &&observer)
     {
+        static_assert(
+            std::is_invocable_v<Observer &, double, const State &>,
+            "Observer must be callable with (double, const State&)");
+
         auto time = 0.0;
 
-        observer(time, state);
+        std::invoke(observer, time, state);
 
         while (time <= end_time)
         {
-            auto best_delay = std::numeric_limits<double>::infinity();
+            auto best_delay =
+                std::numeric_limits<double>::infinity();
+
             const Reaction *next_reaction = nullptr;
 
             for (const auto &reaction : reactions)
             {
-                const auto rate = detail::reaction_rate(reaction, state);
+                const auto rate =
+                    detail::reaction_rate(reaction, state);
 
                 if (rate <= 0.0)
                 {
                     continue;
                 }
 
-                auto distribution = std::exponential_distribution<double>{rate};
-                const auto delay = distribution(random_generator);
+                auto distribution =
+                    std::exponential_distribution<double>{rate};
+
+                const auto delay =
+                    distribution(random_generator);
 
                 if (delay < best_delay)
                 {
@@ -135,12 +153,17 @@ namespace stochastic
                 break;
             }
 
-            if (detail::has_inputs_available(*next_reaction, state))
+            if (detail::has_inputs_available(
+                    *next_reaction,
+                    state))
             {
-                detail::apply_reaction(*next_reaction, state);
+                detail::apply_reaction(
+                    *next_reaction,
+                    state);
             }
 
-            observer(time, state);
+            // Observe the updated state after the reaction.
+            std::invoke(observer, time, state);
         }
     }
 
@@ -153,7 +176,12 @@ namespace stochastic
         const double end_time,
         RandomGenerator &random_generator)
     {
-        simulate(reactions, state, end_time, random_generator, detail::NoObserver{});
+        simulate(
+            reactions,
+            state,
+            end_time,
+            random_generator,
+            detail::NoObserver{});
     }
 
 } // namespace stochastic

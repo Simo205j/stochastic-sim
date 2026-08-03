@@ -13,9 +13,14 @@ namespace covid19_example
         std::uint32_t population_size;
         std::string population_name;
         std::size_t peak_hospitalized;
+
+        // Evidence that the observer was repeatedly invoked.
+        std::size_t observation_count;
+        double last_observed_time;
     };
 
-    // R7: Runs one Covid-19 stochastic simulation and estimates the hospitalized peak.
+    // R7: Runs one Covid-19 stochastic simulation and estimates
+    // the hospitalized peak.
     auto estimate_peak_hospitalized(
         const std::string &population_name,
         std::uint32_t population_size,

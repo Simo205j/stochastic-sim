@@ -3,6 +3,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <random>
 #include <vector>
@@ -349,4 +350,88 @@ TEST_CASE("reaction requiring same input twice is possible with enough amount")
 
     CHECK(state[A.id] == 0);
     CHECK(state[B.id] == 1);
+}
+
+// R7/R8: A stateful, non-copyable user observer must retain its results.
+//
+// The observer is deliberately non-copyable. This test therefore fails
+// to compile if simulate() attempts to accept the observer by value.
+TEST_CASE("simulation preserves a non-copyable stateful observer")
+{
+    using namespace stochastic;
+
+    struct PeakObserver
+    {
+        explicit PeakObserver(
+            const std::size_t observed_id)
+            : observed_id{observed_id}
+        {
+        }
+
+        PeakObserver(
+            const PeakObserver &) = delete;
+
+        auto operator=(
+            const PeakObserver &)
+            -> PeakObserver & = delete;
+
+        PeakObserver(
+            PeakObserver &&) = default;
+
+        auto operator=(
+            PeakObserver &&)
+            -> PeakObserver & = default;
+
+        void operator()(
+            double,
+            const State &observed_state)
+        {
+            ++call_count;
+
+            peak = std::max(
+                peak,
+                observed_state[observed_id]);
+        }
+
+        std::size_t observed_id;
+        std::size_t call_count{0};
+        std::size_t peak{0};
+    };
+
+    const auto A = Reactant{0};
+    const auto B = Reactant{1};
+
+    // The high rate makes all five reactions occur well
+    // before the end time with the fixed seed.
+    const auto reaction =
+        A >> 100.0 >>= B;
+
+    auto reactions =
+        std::vector<Reaction>{reaction};
+
+    auto state =
+        State{5, 0};
+
+    auto random_generator =
+        std::mt19937{42};
+
+    auto observer =
+        PeakObserver{B.id};
+
+    simulate(
+        reactions,
+        state,
+        10.0,
+        random_generator,
+        observer);
+
+    // One initial observation and one observation after
+    // each of the five reactions.
+    CHECK(observer.call_count == 6);
+
+    // The observer has seen B increase from zero to five.
+    CHECK(observer.peak == 5);
+
+    CHECK(state[A.id] == 0);
+    CHECK(state[B.id] == 5);
 }
